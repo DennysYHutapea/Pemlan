@@ -100,6 +100,18 @@ def save_table_to_csv(conn, database, table_name, column_names, file_name):
         for row in rows:
             csv_file.write(",".join(map(str, row)) + "\n")
     print("Data dari tabel '{}' di basis data '{}' berhasil disimpan ke dalam file '{}'.".format(table_name, database, file_name))
+    
+def save_to_csv(file_name, column_names, rows):
+    import csv
+
+    with open(file_name, "w", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(column_names)
+        for row in rows:
+            csv_writer.writerow(row)
+
+    print(f"Data saved to '{file_name}' successfully.")
+
 
 def main():
     conn = connect_to_mysql()
