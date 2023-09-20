@@ -1,6 +1,9 @@
 import mysql.connector
 from prettytable import PrettyTable
 
+user = input("Masukkan user : ")
+password = input("Masukkan password : ")
+
 # Mapping tipe data MySQL ke deskripsi yang lebih dimengerti
 type_mapping = {
     "INT": "bilangan bulat",
@@ -21,11 +24,11 @@ def connect_to_mysql():
     try:
         conn = mysql.connector.connect(
             host="localhost",
-            user="root",
-            password="020874",
+            user=user,
+            password=password, #ganti sesuai password masing-masing
         )
         if conn.is_connected():
-            print("....Koneksi ke MySQL dimulai...")
+            print("\n....Koneksi ke MySQL dimulai...")
             return conn
     except mysql.connector.Error as err:
         print(f"Kesalahan koneksi ke MySQL: {err}")
