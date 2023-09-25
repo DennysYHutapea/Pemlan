@@ -73,11 +73,6 @@ def insert_data(conn, database, table_name, column_names, data):
     conn.commit()
     print("Data berhasil ditambahkan ke tabel '{}'.".format(table_name))
 
-def rename_database(conn, old_name, new_name):
-    cursor = conn.cursor()
-    cursor.execute(f"ALTER DATABASE {old_name} RENAME TO {new_name}")
-    conn.commit()
-    print(f"Nama basis data '{old_name}' berhasil diubah menjadi '{new_name}'.")
 
 def rename_column(conn, database, table_name, old_column_name, new_column_name, new_column_type):
     cursor = conn.cursor()
@@ -136,8 +131,8 @@ def main():
         print("2. Tambah basis data baru.")
         print("3. Hapus basis data.")
         print("4. Tambah data ke tabel.")
-        print("5. Tampilkan data dari tabel.")
-        print("6. Ubah nama database.")
+        print("5. Tambah tabel ke database.")
+        print("6. Tampilkan data dari tabel.")
         print("7. Ubah nama kolom di tabel.")
         print("8. Jadikan kolom pertama sebagai primary key.")
         print("9. Menyimpan Data yang Sudah Ada.")
@@ -145,7 +140,7 @@ def main():
         choice = input("Pilih operasi (1/2/3/4/5/6/7/8/9/10): ")
 
         if choice == "1":
-            db_choice = input("Pilih basis data yang ingin dilihat isinya ({})".format(", ".join(map(str, pilihan))))
+            db_choice = input("Pilih basis data yang ingin dilihat isinya ({}): ".format(", ".join(map(str, pilihan))))
             try:
                 db_choice = int(db_choice)
                 if db_choice not in pilihan:
@@ -208,7 +203,7 @@ def main():
             print("Basis data '{}' berhasil dihapus.".format(del_database))
 
         elif choice == "4":
-            db_choice = input("Pilih basis data tempat tabel berada ({})".format(", ".join(map(str, pilihan))))
+            db_choice = input("Pilih basis data tempat tabel berada ({}): ".format(", ".join(map(str, pilihan))))
             try:
                 db_choice = int(db_choice)
                 if db_choice not in pilihan:
@@ -238,7 +233,44 @@ def main():
             except ValueError:
                 print("Pilihan harus berupa angka.")
 
+        # Di dalam fungsi main()...
+
         elif choice == "5":
+            db_choice = input("Pilih basis data tempat tabel baru akan ditambahkan ({})".format(", ".join(map(str, pilihan))))
+            try:
+                db_choice = int(db_choice)
+                if db_choice not in pilihan:
+                    print("Pilihan tidak valid.")
+                    continue
+                database = databases[db_choice - 1][0]
+                table_name = input("Masukkan nama tabel baru: ")
+                print("Pilihan Sintaks SQL untuk Membuat Tabel:")
+                print("1. Membuat tabel dengan kolom bilangan bulat dan teks")
+                print("2. Membuat tabel dengan kolom bilangan bulat, teks, dan primary key")
+                table_syntax = input("Pilih sintaks yang ingin digunakan (1/2): ")
+                if table_syntax == "1":
+                    table_definition = """
+                    CREATE TABLE {} (
+                        column1 INT,
+                        column2 VARCHAR(255)
+                    )
+                    """.format(table_name)
+                elif table_syntax == "2":
+                    table_definition = """
+                    CREATE TABLE {} (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        column1 INT,
+                        column2 VARCHAR(255)
+                    )
+                    """.format(table_name)
+                else:
+                    print("Sintaks yang dipilih tidak valid.")
+                    continue
+                create_table(conn, database, table_name, table_definition)
+            except ValueError:
+                print("Pilihan harus berupa angka.")
+
+        elif choice == "6":
             db_choice = input("Pilih basis data tempat tabel berada ({})".format(", ".join(map(str, pilihan))))
             try:
                 db_choice = int(db_choice)
@@ -270,19 +302,6 @@ def main():
                     print(table_obj)
                 except ValueError:
                     print("Pilihan harus berupa angka.")
-            except ValueError:
-                print("Pilihan harus berupa angka.")
-
-        elif choice == "6":
-            db_choice = input("Pilih basis data yang ingin diubah namanya ({})".format(", ".join(map(str, pilihan))))
-            try:
-                db_choice = int(db_choice)
-                if db_choice not in pilihan:
-                    print("Pilihan tidak valid.")
-                    continue
-                old_database_name = databases[db_choice - 1][0]
-                new_database_name = input("Masukkan nama baru untuk basis data '{}': ".format(old_database_name))
-                rename_database(conn, old_database_name, new_database_name)
             except ValueError:
                 print("Pilihan harus berupa angka.")
 
