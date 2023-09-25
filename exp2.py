@@ -127,15 +127,9 @@ def connect_to_mysql():
         print(f"Kesalahan koneksi ke MySQL: {err}")
     return None
 
-def show_databases(conn):
-    cursor = conn.cursor()
-    cursor.execute("SHOW DATABASES")
-    return cursor.fetchall()
-
 # Function to process the user's choice
 def process_choice(choice):
-    databases = show_databases(conn)
-    pilihan = list(range(1, len(databases) + 1))
+    databases = None
 
     if choice == "1":
         db_choice = input("Pilih basis data yang ingin dilihat isinya ({})".format(", ".join(map(str, pilihan))))
