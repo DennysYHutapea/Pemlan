@@ -83,35 +83,25 @@ class LoginWindow:
         if conn:
             # Successful login, open the main application window
             self.master.destroy()
-            app = App()
-            app.set_credentials(username, password)
+            #app = App()
+            app = App(username, password)
         else:
             # Display a "Failed Login" message
             self.error_label.configure(text="Username atau Password Invalid", text_color="red")
 
 class App:
-    def __init__(self):
+    def __init__(self, username, password):
         self.master = CTk()
         self.master.title("SQL Interpreter")
         self.master.geometry("500x400")
         self.master.minsize(500, 400)
 
-        self.username = None
-        self.password = None
-
-        self.login_window = None
+        self.username = username
+        self.password = password
 
         self.create_widgets()  # Call the method to create buttons
 
         self.master.mainloop()  # Start the main event loop
-
-    def set_credentials(self, username, password):
-        self.username = username
-        self.password = password
-
-    def set_login_window(self, login_window):
-        # Store the LoginWindow instance
-        self.login_window = login_window
 
     def create_widgets(self):
         # create 2x2 grid system
