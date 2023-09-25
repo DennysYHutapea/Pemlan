@@ -178,25 +178,24 @@ class App:
                 self.result.delete("1.0", "end")  # Clear previous content
                 try:
                     db_choice = int(inserted_value)
+
                     database = databases[db_choice - 1][0]
                     tables = list_tables(conn, database)
 
-                    table_obj = PrettyTable()
                     for table in tables:
+                        print("\nTabel '{}' di basis data '{}':".format(table, database))
                         cursor = conn.cursor()
                         cursor.execute(f"USE {database}")
                         cursor.execute(f"SELECT * FROM {table}")
                         rows = cursor.fetchall()
-                        
-                        if rows:
-                            # Add field names (column names) to the PrettyTable
-                            table_obj.field_names = [column[0] for column in cursor.description]
+                        table_obj = PrettyTable()
+                        table_obj.field_names = [column[0] for column in cursor.description]
+                        for row in rows:
+                            table_obj.add_row(row)
 
-                            # Add rows from the SQL query result
-                            for row in rows:
-                                table_obj.add_row(row)
-                    
-                    table_string = str(table)
+                    table_string = str(table_obj)
+
+                    # Insert the table string into the CTkTextbox
                     self.result.insert("end", table_string)
 
                 except ValueError:
