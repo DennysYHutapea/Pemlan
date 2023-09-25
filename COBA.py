@@ -3,6 +3,7 @@ from tkinter import messagebox
 import mysql.connector
 from prettytable import PrettyTable
 import csv
+from ttkthemes import ThemedTk  # Import ThemedTk from ttkthemes
 
 # Mapping tipe data MySQL ke deskripsi yang lebih dimengerti
 type_mapping = {
@@ -219,27 +220,55 @@ def process_choice_1(choice,user,password):
     databases = show_databases(conn)
     pilihan = list(range(1, len(databases) + 1))
 
-    b_choice = input("Pilih basis data yang ingin dilihat isinya ({})".format(", ".join(map(str, pilihan))))
-    try:
-        db_choice = int(db_choice)
-        if db_choice not in pilihan:
-            print("Pilihan tidak valid.")
-        database = databases[db_choice - 1][0]
-        tables = list_tables(conn, database)
-        print("\nIsi database {}:".format(database))
-        for table in tables:
-            print("\nTabel '{}' di basis data '{}':".format(table, database))
-            cursor = conn.cursor()
-            cursor.execute(f"USE {database}")
-            cursor.execute(f"SELECT * FROM {table}")
-            rows = cursor.fetchall()
-            table_obj = PrettyTable()
-            table_obj.field_names = [column[0] for column in cursor.description]
-            for row in rows:
-                table_obj.add_row(row)
-            print(table_obj)
-    except ValueError:
-        print("Pilihan harus berupa angka.")
+    db_selection_frame = ttk.Frame(root)
+    db_selection_frame.pack()
+
+    result_tab = ttk.Frame(notebook)
+    notebook.add(result_tab, text="Database Results")
+
+    # Display a label and entry for choosing the database
+    label = ttk.Label(db_selection_frame, text="Pilih basis data yang ingin dilihat isinya:")
+    label.pack()
+
+    database_entry = ttk.Entry(db_selection_frame)
+    database_entry.pack()
+
+    def display_database():
+        db_choice = database_entry.get()
+        try:
+            db_choice = int(db_choice)
+            if db_choice not in pilihan:
+                messagebox.showerror("Error", "Pilihan tidak valid.")
+                return
+            database = databases[db_choice - 1][0]
+            tables = list_tables(conn, database)
+
+            # Create a result frame to display tables and their data
+            result_frame = ttk.Frame(result_tab)
+            result_frame.pack()
+
+            result_label = ttk.Label(result_frame, text=f"Isi database {database}:")
+            result_label.pack()
+
+            for table in tables:
+                table_label = ttk.Label(result_frame, text=f"Tabel '{table}' di basis data '{database}':")
+                table_label.pack()
+
+                cursor = conn.cursor()
+                cursor.execute(f"USE {database}")
+                cursor.execute(f"SELECT * FROM {table}")
+                rows = cursor.fetchall()
+                table_obj = PrettyTable()
+                table_obj.field_names = [column[0] for column in cursor.description]
+                for row in rows:
+                    table_obj.add_row(row)
+                table_label = ttk.Label(result_frame, text=table_obj)
+                table_label.pack()
+        except ValueError:
+            messagebox.showerror("Error", "Pilihan harus berupa angka.")
+
+    show_results_button = ttk.Button(result_tab, text="Lihat Isi Basis Data", command=display_database)
+    show_results_button.pack()
 
 def process_choice_2(choice,user,password):
     conn = connect_to_mysql(user, password)
@@ -993,6 +1022,14 @@ def quit_program():
 root = ttk.Tk()
 root.title("Login to MySQL")
 
+# Create the notebook for managing different steps/pages
+notebook = ttk.notebook(root)
+notebook.pack()
+
+# Create and position the login page
+login_tab = ttk.Frame(notebook)
+notebook.add(login_tab, text="Login")
+
 # Create and position the username label and entry field
 username_label = ttk.Label(root, text="Username:")
 username_label.pack()
@@ -1020,6 +1057,10 @@ current_database = None
 # Create the main menu frame
 main_menu_frame = ttk.Frame(root)
 main_menu_frame.pack()
+
+# Add a button to go to the database selection page
+goto_db_selection_button = ttk.Button(login_tab, text="Pilih Database", command=process_choice_1)
+goto_db_selection_button.pack()
 
 # Start the Tkinter main loop
 root.mainloop()
