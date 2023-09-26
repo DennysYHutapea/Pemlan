@@ -1,8 +1,9 @@
 import mysql.connector
+import getpass
 from prettytable import PrettyTable
 
 user = input("Masukkan user : ")
-password = input("Masukkan password : ")
+password = getpass.getpass("Masukkan password : ")
 
 # Mapping tipe data MySQL ke deskripsi yang lebih dimengerti
 type_mapping = {
@@ -31,7 +32,7 @@ def connect_to_mysql():
             print("\n....Koneksi ke MySQL dimulai...")
             return conn
     except mysql.connector.Error as err:
-        print(f"Kesalahan koneksi ke MySQL: {err}")
+        print(f"Kesalahan koneksi ke MySQL. Pastikan user dan password yang digunakan benar")
     return None
 
 def show_databases(conn):
